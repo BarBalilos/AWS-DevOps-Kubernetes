@@ -19,18 +19,19 @@ S3 and SNS, in contrast, connect to the **real AWS resources** from Assignments 
 
 ## Architecture
 
+```text
 Internet → Ingress (Traefik) → frontend Service → frontend Pod (nginx, unprivileged)
-|
-+------------------+------------------+
-| |
-backend Service worker Service
-| |
-backend Pod (Flask) worker Pod (Flask)
-| |
-postgres Service AWS S3 (real) + AWS SNS (real)
-|
-postgres Pod
-
+                                                        |
+                                     +------------------+------------------+
+                                     |                                     |
+                             backend Service                       worker Service
+                                     |                                     |
+                              backend Pod (Flask)                  worker Pod (Flask)
+                                     |                                     |
+                           postgres Service                     AWS S3 (real) + AWS SNS (real)
+                                     |
+                              postgres Pod
+```
 
 Only the frontend is reachable externally, via a Kubernetes Ingress. backend, worker, and postgres are only reachable inside the cluster, and — since k3d's bundled NetworkPolicy controller actually enforces this (see Security section) — only from the specific pods that are supposed to reach them.
 
@@ -43,33 +44,34 @@ Only the frontend is reachable externally, via a Kubernetes Ingress. backend, wo
 
 ## Repository Structure
 
+```text
 Kubernetes/
 ├── k8s/
-│ ├── 00-namespace.yaml
-│ ├── 01-configmap.yaml
-│ ├── 02-secret.example.yaml # committed placeholder — fill in and rename/copy locally
-│ ├── 02-secret.yaml # real values — gitignored, never committed
-│ ├── 03-postgres-deployment.yaml
-│ ├── 04-postgres-service.yaml
-│ ├── 05-backend-deployment.yaml
-│ ├── 06-backend-service.yaml
-│ ├── 07-worker-deployment.yaml
-│ ├── 08-worker-service.yaml
-│ ├── 09-frontend-deployment.yaml
-│ ├── 10-frontend-service.yaml
-│ ├── 11-ingress.yaml
-│ ├── 12-serviceaccounts.yaml
-│ └── 13-networkpolicy.yaml
+│   ├── 00-namespace.yaml
+│   ├── 01-configmap.yaml
+│   ├── 02-secret.example.yaml       # committed placeholder — fill in and rename/copy locally
+│   ├── 02-secret.yaml               # real values — gitignored, never committed
+│   ├── 03-postgres-deployment.yaml
+│   ├── 04-postgres-service.yaml
+│   ├── 05-backend-deployment.yaml
+│   ├── 06-backend-service.yaml
+│   ├── 07-worker-deployment.yaml
+│   ├── 08-worker-service.yaml
+│   ├── 09-frontend-deployment.yaml
+│   ├── 10-frontend-service.yaml
+│   ├── 11-ingress.yaml
+│   ├── 12-serviceaccounts.yaml
+│   └── 13-networkpolicy.yaml
 ├── docker/
-│ ├── backend/ # Dockerfile + app.py + requirements.txt
-│ └── worker/ # Dockerfile + worker.py + requirements.txt
-│ # frontend uses the stock nginxinc/nginx-unprivileged:alpine image directly —
-│ # no custom image needed, config is injected via ConfigMap
+│   ├── backend/    # Dockerfile + app.py + requirements.txt
+│   └── worker/     # Dockerfile + worker.py + requirements.txt
+│   # frontend uses the stock nginxinc/nginx-unprivileged:alpine image directly —
+│   # no custom image needed, config is injected via ConfigMap
 ├── diagrams/
-│ └── architecture-diagram.svg
+│   └── architecture-diagram.svg
 ├── screenshots/
 └── README.md
-
+```
 
 ## Deployment
 
@@ -148,4 +150,4 @@ Solo project — all Terraform/Ansible (Assignments 1–2), Kubernetes manifests
 
 ## Repository
 
-https://github.com/BarBalilos/<new-repo-name> (Kubernetes deployment for the AWS DevOps course project; Terraform/Ansible for Assignments 1–2 live separately at https://github.com/BarBalilos/AWS-DevOps-IaC)
+https://github.com/BarBalilos/AWS-DevOps-Kubernetes (Kubernetes deployment for the AWS DevOps course project; Terraform/Ansible for Assignments 1–2 live separately at https://github.com/BarBalilos/AWS-DevOps-IaC)
