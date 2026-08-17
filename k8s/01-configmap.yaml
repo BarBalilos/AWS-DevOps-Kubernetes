@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: devops-app
+data:
+  DB_HOST: "postgres-service"
+  DB_NAME: "appdb"
+  DB_PORT: "5432"
+  DB_USER: "appadmin"
+  AWS_REGION: "us-east-1"
+  S3_BUCKET: "aws-devops-uploads-3454b8b3"
+  SNS_TOPIC_ARN: "arn:aws:sns:us-east-1:938834037970:aws-devops-notifications"
+  nginx.conf: |
+    server {
+        listen 8080;
+        server_name _;
+
+        location /api/ {
+            proxy_pass http://backend-service:5000/api/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        location /upload {
+            proxy_pass http://worker-service:5001/upload;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        location / {
+            return 200 'App is running. Try /api/records or POST /upload\n';
+            add_header Content-Type text/plain;
+        }
+    }
