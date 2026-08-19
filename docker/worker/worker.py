@@ -10,9 +10,11 @@ sns = boto3.client("sns", region_name=os.environ["AWS_REGION"])
 BUCKET = os.environ["S3_BUCKET"]
 TOPIC_ARN = os.environ.get("SNS_TOPIC_ARN")  # optional until SNS is set up
 
+
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
+
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -31,6 +33,7 @@ def upload():
         )
 
     return jsonify({"status": "uploaded", "key": key}), 201
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
